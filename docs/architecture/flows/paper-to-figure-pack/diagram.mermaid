@@ -1,0 +1,17 @@
+sequenceDiagram
+    autonumber
+    participant User
+    participant CLI as paperfig CLI
+    participant Parser as PDF/MD Parser
+    participant Planner as PlannerAgent
+    participant FS as Run Workspace
+
+    User->>CLI: paperfig generate paper.pdf
+    CLI->>Parser: extract_text(paper)
+    Parser-->>CLI: raw text + spans
+    CLI->>Parser: extract_sections(raw text)
+    Parser-->>CLI: methodology/system/results + spans
+    CLI->>Planner: plan_figures(sections)
+    Planner-->>CLI: FigurePlan list + justifications
+    CLI->>FS: create run directory
+    CLI->>FS: persist plan + metadata

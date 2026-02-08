@@ -1,0 +1,104 @@
+{
+  "documents": [
+    {
+      "path": "README.md",
+      "mode": "hybrid",
+      "required_sections": [
+        "## CLI Usage",
+        "## Outputs",
+        "## Architecture Docs"
+      ]
+    },
+    {
+      "path": "docs/architecture/AI-Architecture-Analysis.md",
+      "mode": "validated",
+      "required_sections": [
+        "## Purpose and Scope",
+        "## Data Flow and Interfaces",
+        "## Failure Modes and Mitigations"
+      ]
+    },
+    {
+      "path": "docs/architecture/flows/index.md",
+      "mode": "validated",
+      "required_sections": [
+        "# System Flows"
+      ]
+    },
+    {
+      "path": "docs/architecture/flows/paper-to-figure-pack/README.md",
+      "mode": "validated",
+      "required_sections": [
+        "## Inputs",
+        "## Outputs"
+      ]
+    },
+    {
+      "path": "docs/architecture/flows/figure-generation-loop/README.md",
+      "mode": "validated",
+      "required_sections": [
+        "## Inputs",
+        "## Outputs"
+      ]
+    },
+    {
+      "path": "docs/architecture/flows/figure-critique-loop/README.md",
+      "mode": "validated",
+      "required_sections": [
+        "## Inputs",
+        "## Outputs"
+      ]
+    },
+    {
+      "path": "docs/architecture/flows/export-and-traceability/README.md",
+      "mode": "validated",
+      "required_sections": [
+        "## Inputs",
+        "## Outputs"
+      ]
+    },
+    {
+      "path": "docs/architecture/flows/docs-governance-loop/README.md",
+      "mode": "validated",
+      "required_sections": [
+        "## Inputs",
+        "## Outputs"
+      ]
+    },
+    {
+      "path": "docs/architecture/flows/architecture-critique-and-repro-audit/README.md",
+      "mode": "validated",
+      "required_sections": [
+        "## Inputs",
+        "## Outputs"
+      ]
+    },
+    {
+      "path": "docs/architecture/flows/autonomous-lab-loop/README.md",
+      "mode": "validated",
+      "required_sections": [
+        "## Inputs",
+        "## Outputs"
+      ]
+    },
+    {
+      "path": "examples/sample_paper.md",
+      "mode": "validated",
+      "required_sections": [
+        "## 1 Methodology",
+        "## 2 System Architecture",
+        "## 3 Results"
+      ]
+    }
+  ],
+  "auto_blocks": {
+    "cli-command-catalog": {
+      "type": "cli_commands"
+    },
+    "flow-template-catalog": {
+      "type": "flow_template_catalog",
+      "template_dir": "paperfig/templates/flows",
+      "pack_id": "expanded_v1"
+    }
+  }
+}

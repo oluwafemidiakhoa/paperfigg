@@ -1,0 +1,15 @@
+{
+  "pack": "expanded_v1",
+  "id": "system_overview",
+  "title": "System Overview",
+  "kind": "system_overview",
+  "order_hint": 20,
+  "required_sections": ["system"],
+  "trigger_rules": [
+    {"section": "system", "keywords": ["module", "architecture", "system"]}
+  ],
+  "element_blueprint": {"nodes": ["modules"], "edges": "dataflow"},
+  "caption_style": "architecture_summary",
+  "traceability_requirements": {"min_spans": 2, "must_trace_nodes": true},
+  "critique_focus": ["faithfulness", "aesthetics"]
+}

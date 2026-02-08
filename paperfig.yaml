@@ -1,0 +1,25 @@
+{
+  "docs": {
+    "scope": "all",
+    "manifest_path": "docs/docs_manifest.yaml",
+    "auto_regen_on_generate": true
+  },
+  "architecture_critique": {
+    "inline_on_generate": true,
+    "block_severity": "critical",
+    "output_file": "architecture_critique.json"
+  },
+  "reproducibility": {
+    "mode": "soft",
+    "output_file": "repro_audit.json"
+  },
+  "templates": {
+    "active_pack": "expanded_v1",
+    "template_dir": "paperfig/templates/flows"
+  },
+  "lab": {
+    "runtime": "single_node_local",
+    "sandbox_policy": "config/lab_policy.yaml",
+    "registry_dir": "lab_runs"
+  }
+}

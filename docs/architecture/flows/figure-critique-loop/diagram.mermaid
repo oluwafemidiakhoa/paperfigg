@@ -1,0 +1,14 @@
+sequenceDiagram
+    autonumber
+    participant Orchestrator
+    participant Critic as CriticAgent
+    participant FS as Run Workspace
+
+    Orchestrator->>Critic: critique(figure.svg, plan, sections)
+    Critic-->>Orchestrator: CritiqueReport
+    Orchestrator->>FS: write critique.json
+    alt Score >= threshold
+        Orchestrator-->>FS: mark figure accepted
+    else Score < threshold
+        Orchestrator-->>FS: mark figure for regeneration
+    end

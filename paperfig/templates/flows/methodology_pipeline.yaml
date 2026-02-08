@@ -1,0 +1,15 @@
+{
+  "pack": "expanded_v1",
+  "id": "methodology_pipeline",
+  "title": "Methodology Pipeline",
+  "kind": "methodology",
+  "order_hint": 10,
+  "required_sections": ["methodology"],
+  "trigger_rules": [
+    {"section": "methodology", "keywords": ["pipeline", "method", "approach"]}
+  ],
+  "element_blueprint": {"nodes": ["input", "processing", "output"], "edges": "sequential"},
+  "caption_style": "concise_method",
+  "traceability_requirements": {"min_spans": 2, "must_trace_nodes": true},
+  "critique_focus": ["faithfulness", "readability"]
+}

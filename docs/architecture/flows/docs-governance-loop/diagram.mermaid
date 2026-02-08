@@ -1,0 +1,17 @@
+sequenceDiagram
+    autonumber
+    participant CLI as paperfig docs check/regenerate
+    participant Manifest as docs_manifest
+    participant Renderer as Docs Renderer
+    participant FS as Repository Files
+
+    CLI->>Manifest: load manifest rules
+    CLI->>Renderer: render auto-gen blocks
+    Renderer->>FS: compare rendered docs vs current docs
+    alt check mode and drift found
+        Renderer-->>CLI: drift_detected=true
+        CLI-->>CLI: exit non-zero
+    else regenerate mode
+        Renderer->>FS: write regenerated docs
+        Renderer-->>CLI: report with changed docs
+    end

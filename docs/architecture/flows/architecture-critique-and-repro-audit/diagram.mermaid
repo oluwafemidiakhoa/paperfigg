@@ -1,0 +1,22 @@
+sequenceDiagram
+    autonumber
+    participant Orchestrator
+    participant ArchCritic as ArchitectureCriticAgent
+    participant Audit as Reproducibility Audit
+    participant FS as Run Workspace
+
+    Orchestrator->>ArchCritic: critique(run artifacts)
+    ArchCritic-->>Orchestrator: architecture_critique report
+    Orchestrator->>FS: write architecture_critique.json
+    alt severity >= block threshold
+        Orchestrator-->>Orchestrator: fail run
+    else continue
+        Orchestrator->>Audit: evaluate reproducibility
+        Audit-->>Orchestrator: repro_audit report
+        Orchestrator->>FS: write repro_audit.json
+        alt audit mode hard and checks failed
+            Orchestrator-->>Orchestrator: fail run
+        else
+            Orchestrator-->>FS: finalize run
+        end
+    end

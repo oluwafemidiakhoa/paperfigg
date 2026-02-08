@@ -1,0 +1,15 @@
+{
+  "pack": "expanded_v1",
+  "id": "training_compute_profile",
+  "title": "Training and Compute Profile",
+  "kind": "compute_profile",
+  "order_hint": 70,
+  "required_sections": ["methodology"],
+  "trigger_rules": [
+    {"section": "methodology", "keywords": ["train", "gpu", "epoch", "compute"]}
+  ],
+  "element_blueprint": {"chart": "timeline_or_table", "metrics": ["time", "memory", "throughput"]},
+  "caption_style": "compute_report",
+  "traceability_requirements": {"min_spans": 1, "must_trace_nodes": false},
+  "critique_focus": ["conciseness", "aesthetics"]
+}

@@ -1,0 +1,15 @@
+{
+  "pack": "expanded_v1",
+  "id": "ablation_matrix",
+  "title": "Ablation Matrix",
+  "kind": "ablation",
+  "order_hint": 40,
+  "required_sections": ["results"],
+  "trigger_rules": [
+    {"section": "results", "keywords": ["ablation", "remove", "component"]}
+  ],
+  "element_blueprint": {"table": "component_vs_metric", "highlight": "best_variant"},
+  "caption_style": "ablation_focus",
+  "traceability_requirements": {"min_spans": 1, "must_trace_nodes": true},
+  "critique_focus": ["faithfulness", "readability"]
+}

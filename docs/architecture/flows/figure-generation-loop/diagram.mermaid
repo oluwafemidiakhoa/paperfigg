@@ -1,0 +1,13 @@
+sequenceDiagram
+    autonumber
+    participant Orchestrator
+    participant Generator as GeneratorAgent
+    participant MCP as PaperBanana MCP
+    participant FS as Run Workspace
+
+    Orchestrator->>Generator: generate(figure_plan, sections)
+    Generator->>MCP: request SVG + element metadata
+    MCP-->>Generator: SVG + elements
+    Generator->>FS: write figure.svg
+    Generator->>FS: write element_metadata.json
+    Generator-->>Orchestrator: FigureCandidate

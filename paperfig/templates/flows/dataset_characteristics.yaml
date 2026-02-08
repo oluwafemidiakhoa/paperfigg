@@ -1,0 +1,15 @@
+{
+  "pack": "expanded_v1",
+  "id": "dataset_characteristics",
+  "title": "Dataset Characteristics",
+  "kind": "dataset_overview",
+  "order_hint": 60,
+  "required_sections": ["methodology"],
+  "trigger_rules": [
+    {"section": "methodology", "keywords": ["dataset", "data", "corpus"]}
+  ],
+  "element_blueprint": {"table": "split_statistics", "chart": "class_distribution"},
+  "caption_style": "dataset_summary",
+  "traceability_requirements": {"min_spans": 1, "must_trace_nodes": true},
+  "critique_focus": ["faithfulness", "readability"]
+}

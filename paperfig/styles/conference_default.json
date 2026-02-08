@@ -1,0 +1,24 @@
+{
+  "name": "Default Conference Style",
+  "font": {
+    "family": "Times New Roman",
+    "title_size": 22,
+    "label_size": 14
+  },
+  "stroke": {
+    "width": 1.5,
+    "color": "#111111"
+  },
+  "palette": [
+    "#1f77b4",
+    "#ff7f0e",
+    "#2ca02c",
+    "#d62728",
+    "#9467bd"
+  ],
+  "spacing": {
+    "padding": 24,
+    "gap": 16
+  },
+  "notes": "Baseline style reference; replace with conference-specific settings."
+}

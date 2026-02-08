@@ -1,0 +1,14 @@
+sequenceDiagram
+    autonumber
+    participant CLI as paperfig export
+    participant Exporters
+    participant FS as Export Folder
+
+    CLI->>Exporters: export_svg(figure.svg)
+    Exporters->>FS: write figure.svg
+    CLI->>Exporters: export_png(figure.svg)
+    Exporters->>FS: write figure.png
+    CLI->>Exporters: export_latex(figure.svg)
+    Exporters->>FS: write figure.tex
+    CLI->>Exporters: write captions.txt
+    CLI->>Exporters: write traceability.json

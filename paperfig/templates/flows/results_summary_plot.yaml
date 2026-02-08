@@ -1,0 +1,15 @@
+{
+  "pack": "expanded_v1",
+  "id": "results_summary_plot",
+  "title": "Results Summary Plot",
+  "kind": "results_plot",
+  "order_hint": 30,
+  "required_sections": ["results"],
+  "trigger_rules": [
+    {"section": "results", "keywords": ["improv", "score", "result", "benchmark"]}
+  ],
+  "element_blueprint": {"plot": "bar_or_line", "series": "baseline_vs_proposed"},
+  "caption_style": "quantitative_highlight",
+  "traceability_requirements": {"min_spans": 2, "must_trace_nodes": true},
+  "critique_focus": ["faithfulness", "conciseness"]
+}

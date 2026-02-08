@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=67", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "paperfig"
+version = "0.2.0"
+description = "Agentic CLI for generating academic figures from research papers"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "paperfig contributors" }]
+license = { text = "MIT" }
+dependencies = [
+  "typer>=0.9.0",
+]
+
+[project.optional-dependencies]
+pdf = ["pdfminer.six>=20221105", "pypdf>=3.0.0"]
+svg = ["cairosvg>=2.7.0"]
+mcp = ["mcp>=1.0.0"]
+yaml = ["PyYAML>=6.0.0"]
+
+[project.scripts]
+paperfig = "paperfig.cli:app"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["paperfig*"]
+
+[tool.setuptools.package-data]
+paperfig = ["prompts/*.txt", "styles/*.json", "templates/flows/*.yaml"]

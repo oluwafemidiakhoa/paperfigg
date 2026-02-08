@@ -1,0 +1,14 @@
+stages:
+  - quality
+
+quality:
+  stage: quality
+  image: python:3.12
+  before_script:
+    - python -m pip install --upgrade pip
+    - pip install -e ".[yaml]"
+  script:
+    - ./scripts/check_quality.sh
+  only:
+    - merge_requests
+    - branches

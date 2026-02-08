@@ -1,0 +1,15 @@
+{
+  "pack": "expanded_v1",
+  "id": "error_analysis_breakdown",
+  "title": "Error Analysis Breakdown",
+  "kind": "error_analysis",
+  "order_hint": 50,
+  "required_sections": ["results"],
+  "trigger_rules": [
+    {"section": "results", "keywords": ["error", "failure", "mistake"]}
+  ],
+  "element_blueprint": {"plot": "stacked_bar", "groups": "error_types"},
+  "caption_style": "error_diagnostics",
+  "traceability_requirements": {"min_spans": 1, "must_trace_nodes": false},
+  "critique_focus": ["readability", "conciseness"]
+}

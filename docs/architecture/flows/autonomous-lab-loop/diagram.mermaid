@@ -1,0 +1,26 @@
+sequenceDiagram
+    autonumber
+    participant User
+    participant CLI as paperfig lab
+    participant Lab as LabOrchestrator
+    participant Policy as LabPolicy
+    participant Runner as Executor
+    participant FS as Lab Registry
+
+    User->>CLI: lab propose <topic_or_run_id>
+    CLI->>Lab: create spec
+    Lab->>FS: write spec.yaml and index entry
+    User->>CLI: lab run <experiment_id>
+    CLI->>Lab: execute experiment
+    Lab->>Policy: validate command
+    Policy-->>Lab: allow/deny
+    alt allowed
+        Lab->>Runner: run command with timeout
+        Runner-->>Lab: stdout/stderr/return code
+    else denied
+        Lab-->>Lab: policy violation result
+    end
+    Lab->>FS: write execution_log.json and update index
+    User->>CLI: lab review <experiment_id>
+    CLI->>Lab: generate review
+    Lab->>FS: write review.json and update index
