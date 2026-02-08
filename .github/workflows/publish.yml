@@ -5,6 +5,15 @@ on:
     tags:
       - "v*"
   workflow_dispatch:
+    inputs:
+      publish:
+        description: "Set to true to publish to PyPI on manual runs."
+        required: false
+        default: "false"
+      expected_version:
+        description: "Optional version sanity check (for example 0.2.2)."
+        required: false
+        default: ""
 
 jobs:
   publish:
@@ -31,6 +40,39 @@ jobs:
       - name: Build distribution artifacts
         run: bash ./scripts/build_dist.sh
 
+      - name: Verify version and ref
+        env:
+          REF_NAME: ${{ github.ref_name }}
+          REF_TYPE: ${{ github.ref_type }}
+          EVENT_NAME: ${{ github.event_name }}
+          EXPECTED_VERSION: ${{ github.event.inputs.expected_version }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os
+          import tomllib
+
+          version = tomllib.loads(Path("pyproject.toml").read_text(encoding="utf-8"))["project"]["version"]
+          ref_name = os.getenv("REF_NAME", "")
+          ref_type = os.getenv("REF_TYPE", "")
+          event_name = os.getenv("EVENT_NAME", "")
+          expected = os.getenv("EXPECTED_VERSION", "").strip()
+
+          if ref_type == "tag" and ref_name.startswith("v"):
+              tag_version = ref_name[1:]
+              if version != tag_version:
+                  raise SystemExit(
+                      f"Version mismatch: pyproject.toml has {version}, tag is {tag_version}."
+                  )
+
+          if event_name == "workflow_dispatch" and expected and version != expected:
+              raise SystemExit(
+                  f"Version mismatch: pyproject.toml has {version}, expected_version input is {expected}."
+              )
+
+          print(f"package_version={version}")
+          PY
+
       - name: Upload dist artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -39,6 +81,7 @@ jobs:
           if-no-files-found: error
 
       - name: Publish to PyPI
+        if: startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'workflow_dispatch' && github.event.inputs.publish == 'true')
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           user: __token__

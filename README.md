@@ -138,6 +138,7 @@ Default config lives in `paperfig.yaml`:
 - GitHub Actions docs drift gate: `.github/workflows/docs-drift.yml`
 - GitHub Actions PyPI publish: `.github/workflows/publish.yml`
 - Publish workflow expects `PYPI_API_TOKEN` secret in GitHub environment `pypi`.
+- Manual `publish.yml` runs are dry-run by default; set workflow input `publish=true` to actually upload.
 - GitLab pipeline: `.gitlab-ci.yml`
 - All wrappers call shared scripts in `scripts/` (no duplicated CI logic in YAML)
 
