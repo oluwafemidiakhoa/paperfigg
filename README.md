@@ -46,6 +46,20 @@ paperfig doctor --probe-mcp
 paperfig generate examples/sample_paper.md --mode real
 ```
 
+## What's New In v0.3.0
+- Contributor flywheel:
+  - `paperfig templates lint` validates flow templates against JSON Schema.
+  - Domain-pack loading supports directory or Python package packs via `--pack` and `--template-pack`.
+  - Architecture critique supports rule plugins with `--list-rules` and `--enable`.
+- Deterministic reproducibility:
+  - `paperfig rerun <run_id>` replays a run deterministically from saved artifacts.
+  - `paperfig diff <run_id_1> <run_id_2>` compares run metrics and writes `diff.json`.
+- Contributor mode:
+  - `paperfig generate ... --contrib` writes planner notes, critic notes, `CONTRIBUTING_NOTES.md`, and `contrib.log`.
+- Windows PNG enablement:
+  - `paperfig doctor --fix png --verify` prints guided setup and verification steps.
+  - PNG export warnings point to `paperfig doctor --fix png`.
+
 ## What You Get
 - Generated figures (SVG and optional transparent PNG)
 - LaTeX include snippets
@@ -122,6 +136,7 @@ Each run creates a `runs/<run_id>/` workspace containing:
 - `docs_drift_report.json`
 - `architecture_critique.json`
 - `repro_audit.json`
+- `planner_notes.md`, `CONTRIBUTING_NOTES.md`, and `contrib.log` when `--contrib` is enabled
 - `exports/` with PNG, SVG, LaTeX snippets, and `export_report.json`
 
 ## Configuration
@@ -156,3 +171,15 @@ Default config lives in `paperfig.yaml`:
 See:
 - `docs/architecture/AI-Architecture-Analysis.md`
 - `docs/architecture/flows/index.md`
+- `docs/templates/HOW_TO_ADD_A_FLOW.md`
+- `docs/templates/DOMAIN_PACKS.md`
+- `docs/platform/WINDOWS_PNG.md`
+
+## Publish Troubleshooting
+- Package name on PyPI is `paperfigg` (not `paperfig`).
+- If publish fails with "file already exists", rerun is safe because publish uses `skip-existing: true`.
+- If publish fails with OIDC/token project mismatch:
+  - verify Trusted Publisher is configured for project `paperfigg`
+  - owner/repo must be `oluwafemidiakhoa/paperfig`
+  - workflow must be `publish.yml`
+  - environment name must be `pypi`
