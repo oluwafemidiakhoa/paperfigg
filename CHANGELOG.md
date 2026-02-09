@@ -2,6 +2,10 @@
 
 All notable changes to this project are documented in this file.
 
+## [0.2.6] - 2026-02-08
+- Fixed publish workflow compatibility on Python 3.10 by removing `tomllib` dependency in version verification.
+- Fixed quality script execution chain to invoke docs drift checks via `bash`.
+
 ## [0.2.2] - 2026-02-08
 - Fixed GitHub Actions script invocation by running shell scripts through `bash` in CI, docs-drift, and publish workflows.
 - Added release hygiene to keep workflow and tag behavior consistent for PyPI publishing.
