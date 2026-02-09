@@ -9,18 +9,19 @@ The core differentiator is that agent reasoning and architecture decisions are s
 
 ## Install
 - Standard CLI + PNG export:
-  - `pip install "paperfig[cli,png]"`
+  - `pip install "paperfigg[cli,png]"`
 - Developer tooling:
-  - `pip install "paperfig[cli,png,dev,yaml,pdf,mcp]"`
+  - `pip install "paperfigg[cli,png,dev,yaml,pdf,mcp]"`
 - CLI-first local install:
   - `pipx install .`
   - `uv tool install .`
+  - Published package name is `paperfigg`; CLI command remains `paperfig`.
 
 ## Quickstart (Mock Mode, No Keys)
 Mock mode is designed for instant local runs and realistic output artifacts.
 
 ```bash
-pip install "paperfig[cli,png]"
+pip install "paperfigg[cli,png]"
 paperfig doctor
 paperfig generate examples/sample_paper.md --mode mock
 paperfig docs check
@@ -28,7 +29,7 @@ paperfig docs check
 
 ## 1-Minute Demo
 ```bash
-pip install "paperfig[cli,png]"
+pip install "paperfigg[cli,png]"
 paperfig doctor
 paperfig generate examples/sample_paper.md --mode mock
 ls runs/*/figures/*/final/figure.svg
@@ -38,7 +39,7 @@ ls runs/*/figures/*/final/figure.svg
 Use full mode when you want real PaperBanana generation via MCP.
 
 ```bash
-pip install "paperfig[cli,png,mcp]"
+pip install "paperfigg[cli,png,mcp]"
 export PAPERFIG_MCP_SERVER=paperbanana
 export PAPERFIG_MCP_COMMAND="python -m your_mcp_server"
 paperfig doctor --probe-mcp
