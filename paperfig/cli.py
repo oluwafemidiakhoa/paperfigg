@@ -3,10 +3,11 @@ from __future__ import annotations
 import importlib
 import json
 import os
+import platform
 from pathlib import Path
 import shlex
 import shutil
-from typing import Optional
+from typing import List, Optional
 
 import typer
 
@@ -16,6 +17,7 @@ from paperfig.agents.critic import CriticAgent
 from paperfig.command_catalog import get_command_catalog
 from paperfig.lab.orchestrator import LabOrchestrator
 from paperfig.pipeline.orchestrator import Orchestrator
+from paperfig.templates.lint import lint_template_catalog
 from paperfig.templates.loader import load_template_catalog, validate_template_catalog
 from paperfig.utils.config import load_config
 from paperfig.utils.paperbanana import PaperBananaClient
@@ -72,12 +74,45 @@ def _dependency_check(module_name: str, required: bool) -> dict:
         }
     except Exception as exc:
         status = "fail" if required else "warn"
+        message = f"Module '{module_name}' is unavailable: {exc}"
+        if module_name == "cairosvg":
+            message = f"{message} Run: paperfig doctor --fix png"
         return {
             "check": f"python_module:{module_name}",
             "status": status,
             "required": required,
-            "message": f"Module '{module_name}' is unavailable: {exc}",
+            "message": message,
         }
+
+
+def _png_fix_guidance() -> str:
+    system = platform.system().lower()
+    if system.startswith("windows"):
+        return "\n".join(
+            [
+                "Windows PNG setup options:",
+                "1) MSYS2 UCRT64 (recommended for system-wide Cairo):",
+                "   - winget install MSYS2.MSYS2",
+                "   - C:\\msys64\\ucrt64.exe",
+                "   - pacman -Syu",
+                "   - pacman -S --needed mingw-w64-ucrt-x86_64-cairo mingw-w64-ucrt-x86_64-pango mingw-w64-ucrt-x86_64-gdk-pixbuf2",
+                "   - Add C:\\msys64\\ucrt64\\bin to PATH",
+                "2) Conda-forge environment:",
+                "   - conda create -n paperfig-png python=3.10 cairosvg cairo pango gdk-pixbuf -c conda-forge",
+                "   - conda activate paperfig-png",
+                "Verification:",
+                "   - paperfig doctor --fix png --verify",
+                "   - paperfig doctor",
+            ]
+        )
+    return "\n".join(
+        [
+            "Install Cairo system libraries and cairosvg for PNG export.",
+            "Then verify with:",
+            "  - paperfig doctor --fix png --verify",
+            "  - paperfig doctor",
+        ]
+    )
 
 
 def _mcp_check(probe_mcp: bool) -> dict:
@@ -241,6 +276,11 @@ def generate(
         "soft",
         help="Reproducibility audit mode: soft or hard.",
     ),
+    contrib: bool = typer.Option(
+        False,
+        "--contrib",
+        help="Contributor mode: verbose artifacts, planner/critic notes, and run CONTRIBUTING_NOTES.",
+    ),
 ) -> None:
     if mode not in {"auto", "mock", "real"}:
         raise typer.BadParameter("mode must be one of: auto, mock, real")
@@ -270,7 +310,7 @@ def generate(
             arch_critique_block_severity=arch_critique_block_severity,
             repro_audit_mode=repro_audit_mode,
         )
-        run_id = orchestrator.generate(paper_path)
+        run_id = orchestrator.generate(paper_path, contrib=contrib)
     except RuntimeError as exc:
         typer.echo(f"Generation failed: {exc}")
         raise typer.Exit(code=1)
@@ -326,6 +366,63 @@ def critique(
 
 
 @app.command()
+def rerun(
+    run_id: str = typer.Argument(..., help="Existing run ID to replay deterministically"),
+    run_root: Path = typer.Option(Path("runs"), help="Root directory for run outputs"),
+    contrib: bool = typer.Option(
+        False,
+        "--contrib",
+        help="Contributor mode for the replayed run.",
+    ),
+) -> None:
+    orchestrator = Orchestrator(run_root=run_root)
+    try:
+        new_run_id = orchestrator.rerun(source_run_id=run_id, contrib=contrib)
+    except RuntimeError as exc:
+        typer.echo(f"Rerun failed: {exc}")
+        raise typer.Exit(code=1)
+    typer.echo(f"Rerun created: {new_run_id}")
+    typer.echo(f"Output directory: {run_root / new_run_id}")
+
+
+@app.command()
+def diff(
+    run_id_1: str = typer.Argument(..., help="Base run ID"),
+    run_id_2: str = typer.Argument(..., help="Target run ID"),
+    run_root: Path = typer.Option(Path("runs"), help="Root directory for run outputs"),
+    output_dir: Optional[Path] = typer.Option(None, help="Optional output directory for diff artifacts"),
+    as_json: bool = typer.Option(False, "--as-json", help="Print diff report as JSON"),
+) -> None:
+    orchestrator = Orchestrator(run_root=run_root)
+    report = orchestrator.diff(run_id_1=run_id_1, run_id_2=run_id_2, output_dir=output_dir)
+    if as_json:
+        typer.echo(json.dumps(report, indent=2))
+        return
+
+    typer.echo(f"Run 1: {run_id_1}")
+    typer.echo(f"Run 2: {run_id_2}")
+    typer.echo(f"Diff output: {Path(report.get('diff_dir', '')) / 'diff.json'}")
+    metrics = report.get("metrics", {})
+    typer.echo(
+        "accepted_count: "
+        f"{metrics.get('accepted_count', {}).get('run_1')} -> "
+        f"{metrics.get('accepted_count', {}).get('run_2')}"
+    )
+    typer.echo(
+        "avg_final_score: "
+        f"{metrics.get('avg_final_score', {}).get('run_1')} -> "
+        f"{metrics.get('avg_final_score', {}).get('run_2')}"
+    )
+    typer.echo(
+        "avg_traceability_coverage: "
+        f"{metrics.get('avg_traceability_coverage', {}).get('run_1')} -> "
+        f"{metrics.get('avg_traceability_coverage', {}).get('run_2')}"
+    )
+    typer.echo(f"Changed figures: {len(report.get('changed_figures', []))}")
+    typer.echo(f"Changed JSON artifacts: {len(report.get('changed_artifacts', []))}")
+
+
+@app.command()
 def export(
     run_id: str = typer.Argument(..., help="Run ID to export"),
     run_root: Path = typer.Option(Path("runs"), help="Root directory for run outputs"),
@@ -354,7 +451,20 @@ def doctor(
         "--strict",
         help="Exit non-zero if any check reports failure.",
     ),
+    fix: Optional[str] = typer.Option(
+        None,
+        "--fix",
+        help="Show guided fix instructions for a subsystem (currently: png).",
+    ),
+    verify: bool = typer.Option(
+        False,
+        "--verify",
+        help="Re-run targeted verification for the selected --fix subsystem.",
+    ),
 ) -> None:
+    if fix and fix not in {"png"}:
+        raise typer.BadParameter("fix must be one of: png")
+
     checks = [
         _dependency_check("typer", required=True),
         _dependency_check("rich", required=False),
@@ -382,6 +492,16 @@ def doctor(
         typer.echo(json.dumps(report, indent=2))
     else:
         _render_doctor_output(report)
+        if fix == "png":
+            typer.echo("")
+            typer.echo(_png_fix_guidance())
+            if verify:
+                verify_check = _dependency_check("cairosvg", required=False)
+                typer.echo("")
+                typer.echo(
+                    "PNG verify: "
+                    f"{verify_check.get('status')} - {verify_check.get('message')}"
+                )
 
     if required_failures > 0:
         raise typer.Exit(code=1)
@@ -391,12 +511,18 @@ def doctor(
 
 @app.command(name="critique-architecture")
 def critique_architecture(
-    run_id: str = typer.Argument(..., help="Run ID to critique"),
+    run_id: Optional[str] = typer.Argument(None, help="Run ID to critique"),
     run_root: Path = typer.Option(Path("runs"), help="Root directory for run outputs"),
     as_json: bool = typer.Option(False, "--as-json", help="Print report as JSON"),
     block_severity: str = typer.Option(
         "critical",
         help="Severity threshold that marks the report as blocking.",
+    ),
+    list_rules: bool = typer.Option(False, "--list-rules", help="List built-in architecture rules and exit."),
+    enable: Optional[List[str]] = typer.Option(
+        None,
+        "--enable",
+        help="Enable a subset of architecture rules (repeatable). Default: all built-in rules.",
     ),
 ) -> None:
     if block_severity not in SEVERITY_ORDER:
@@ -405,11 +531,22 @@ def critique_architecture(
         )
 
     orchestrator = Orchestrator(run_root=run_root)
-    report = orchestrator.critique_architecture(
-        run_id=run_id,
-        block_severity=block_severity,
-        persist=True,
-    )
+    if list_rules:
+        for rule in orchestrator.architecture_critic.available_rules():
+            typer.echo(f"- {rule['rule_id']}: {rule['description']}")
+        return
+    if not run_id:
+        raise typer.BadParameter("run_id is required unless --list-rules is provided")
+
+    try:
+        report = orchestrator.critique_architecture(
+            run_id=run_id,
+            block_severity=block_severity,
+            persist=True,
+            enabled_rules=enable,
+        )
+    except ValueError as exc:
+        raise typer.BadParameter(str(exc)) from exc
 
     if as_json:
         typer.echo(json.dumps(report, indent=2))
@@ -553,8 +690,13 @@ def docs_check(
 def templates_list(
     template_dir: Path = typer.Option(Path("paperfig/templates/flows"), help="Template directory."),
     pack_id: str = typer.Option("expanded_v1", help="Template pack identifier."),
+    pack: Optional[str] = typer.Option(
+        None,
+        "--pack",
+        help="External template pack source (directory path or python package).",
+    ),
 ) -> None:
-    catalog = load_template_catalog(template_dir=template_dir, pack_id=pack_id)
+    catalog = load_template_catalog(template_dir=template_dir, pack_id=pack_id, pack=pack)
     typer.echo(f"Template pack: {catalog.pack_id}")
     for template in catalog.templates:
         typer.echo(f"- {template.template_id}: {template.title} ({template.kind})")
@@ -564,13 +706,35 @@ def templates_list(
 def templates_validate(
     template_dir: Path = typer.Option(Path("paperfig/templates/flows"), help="Template directory."),
     pack_id: str = typer.Option("expanded_v1", help="Template pack identifier."),
+    pack: Optional[str] = typer.Option(
+        None,
+        "--pack",
+        help="External template pack source (directory path or python package).",
+    ),
 ) -> None:
-    errors = validate_template_catalog(template_dir=template_dir, pack_id=pack_id)
+    errors = validate_template_catalog(template_dir=template_dir, pack_id=pack_id, pack=pack)
     if errors:
         for error in errors:
             typer.echo(f"Error: {error}")
         raise typer.Exit(code=1)
     typer.echo("Template catalog is valid.")
+
+
+@templates_app.command("lint")
+def templates_lint(
+    template_dir: Path = typer.Option(Path("paperfig/templates/flows"), help="Template directory."),
+    pack: Optional[str] = typer.Option(
+        None,
+        "--pack",
+        help="External template pack source (directory path or python package).",
+    ),
+) -> None:
+    errors = lint_template_catalog(template_dir=template_dir, pack=pack)
+    if errors:
+        for error in errors:
+            typer.echo(f"Error: {error}")
+        raise typer.Exit(code=1)
+    typer.echo("Flow templates satisfy flow_template.schema.json.")
 
 
 @lab_app.command("init")

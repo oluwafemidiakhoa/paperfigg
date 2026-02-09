@@ -2,6 +2,15 @@
 
 All notable changes to this project are documented in this file.
 
+## [0.3.0] - 2026-02-09
+- Added a contributor flow-template framework with JSON Schema validation and `paperfig templates lint`.
+- Added template-pack discovery from directory paths or Python package resources, including `paperfig templates list --pack`.
+- Refactored architecture critique into plugin rules under `paperfig/critique/rules` with CLI rule controls (`--list-rules`, `--enable`).
+- Added deterministic replay and comparison commands: `paperfig rerun` and `paperfig diff` with persisted `diff.json` artifacts.
+- Added contributor mode (`paperfig generate --contrib`) to persist planner/critic notes and run-level `CONTRIBUTING_NOTES.md`.
+- Added guided PNG remediation with `paperfig doctor --fix png` and improved PNG export warnings that include fix commands.
+- Added contributor/platform docs for flow authoring, domain packs, and Windows PNG setup.
+
 ## [0.2.6] - 2026-02-08
 - Fixed publish workflow compatibility on Python 3.10 by removing `tomllib` dependency in version verification.
 - Fixed quality script execution chain to invoke docs drift checks via `bash`.

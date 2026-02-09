@@ -107,6 +107,13 @@ class FlowTemplate:
     caption_style: str
     traceability_requirements: Dict[str, Any]
     critique_focus: List[str]
+    name: str = ""
+    template_type: str = ""
+    inputs: Dict[str, Any] = field(default_factory=dict)
+    steps: List[Dict[str, Any]] = field(default_factory=list)
+    outputs: Dict[str, Any] = field(default_factory=dict)
+    scoring: Dict[str, Any] = field(default_factory=dict)
+    metadata: Dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass

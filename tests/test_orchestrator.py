@@ -379,6 +379,135 @@ Result details.
             for figure in aesthetics_failed["figures"]:
                 self.assertIn("aesthetics", [dim.lower() for dim in figure["failed_dimensions"]])
 
+    def test_export_warning_includes_doctor_fix_hint_when_png_skipped(self) -> None:
+        content = """
+# Title
+
+## Methodology
+Method details.
+
+## System
+System details.
+
+## Results
+Result details.
+""".strip()
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp = Path(tmpdir)
+            paper = tmp / "paper.md"
+            runs = tmp / "runs"
+            paper.write_text(content, encoding="utf-8")
+
+            old_mock = os.environ.get("PAPERFIG_MOCK_PAPERBANANA")
+            os.environ["PAPERFIG_MOCK_PAPERBANANA"] = "1"
+            try:
+                orchestrator = Orchestrator(run_root=runs)
+                run_id = orchestrator.generate(paper)
+            finally:
+                if old_mock is None:
+                    os.environ.pop("PAPERFIG_MOCK_PAPERBANANA", None)
+                else:
+                    os.environ["PAPERFIG_MOCK_PAPERBANANA"] = old_mock
+
+            def _fake_fail_png(svg_path: Path, png_path: Path) -> None:
+                del svg_path, png_path
+                raise RuntimeError("cairosvg is required for PNG export. Run: paperfig doctor --fix png")
+
+            with patch("paperfig.pipeline.orchestrator.export_png", _fake_fail_png):
+                out = orchestrator.export(run_id)
+
+            report = json.loads((out / "export_report.json").read_text(encoding="utf-8"))
+            warnings = report.get("warnings", [])
+            self.assertGreaterEqual(len(warnings), 1)
+            self.assertTrue(any("paperfig doctor --fix png" in item for item in warnings))
+
+    def test_rerun_and_diff_artifacts(self) -> None:
+        content = """
+# Title
+
+## Methodology
+Method details.
+
+## System
+System details.
+
+## Results
+Result details.
+""".strip()
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp = Path(tmpdir)
+            paper = tmp / "paper.md"
+            runs = tmp / "runs"
+            paper.write_text(content, encoding="utf-8")
+
+            old_mock = os.environ.get("PAPERFIG_MOCK_PAPERBANANA")
+            os.environ["PAPERFIG_MOCK_PAPERBANANA"] = "1"
+            try:
+                orchestrator = Orchestrator(run_root=runs)
+                run_id_1 = orchestrator.generate(paper)
+                run_id_2 = orchestrator.rerun(run_id_1)
+            finally:
+                if old_mock is None:
+                    os.environ.pop("PAPERFIG_MOCK_PAPERBANANA", None)
+                else:
+                    os.environ["PAPERFIG_MOCK_PAPERBANANA"] = old_mock
+
+            self.assertNotEqual(run_id_1, run_id_2)
+            run_1_plan = json.loads((runs / run_id_1 / "plan.json").read_text(encoding="utf-8"))
+            run_2_plan = json.loads((runs / run_id_2 / "plan.json").read_text(encoding="utf-8"))
+            self.assertEqual(run_1_plan, run_2_plan)
+
+            rerun_meta = json.loads((runs / run_id_2 / "run.json").read_text(encoding="utf-8"))
+            self.assertEqual(rerun_meta.get("rerun_of"), run_id_1)
+            self.assertTrue(rerun_meta.get("reused_plan"))
+
+            diff_report = orchestrator.diff(run_id_1, run_id_2)
+            diff_json_path = Path(diff_report["diff_dir"]) / "diff.json"
+            self.assertTrue(diff_json_path.exists())
+            self.assertIn("metrics", diff_report)
+            self.assertIn("changed_figures", diff_report)
+            self.assertIn("changed_artifacts", diff_report)
+
+    def test_generate_contrib_writes_notes_and_logs(self) -> None:
+        content = """
+# Title
+
+## Methodology
+Method details.
+
+## System
+System details.
+
+## Results
+Result details.
+""".strip()
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp = Path(tmpdir)
+            paper = tmp / "paper.md"
+            runs = tmp / "runs"
+            paper.write_text(content, encoding="utf-8")
+
+            old_mock = os.environ.get("PAPERFIG_MOCK_PAPERBANANA")
+            os.environ["PAPERFIG_MOCK_PAPERBANANA"] = "1"
+            try:
+                orchestrator = Orchestrator(run_root=runs)
+                run_id = orchestrator.generate(paper, contrib=True)
+            finally:
+                if old_mock is None:
+                    os.environ.pop("PAPERFIG_MOCK_PAPERBANANA", None)
+                else:
+                    os.environ["PAPERFIG_MOCK_PAPERBANANA"] = old_mock
+
+            run_dir = runs / run_id
+            self.assertTrue((run_dir / "CONTRIBUTING_NOTES.md").exists())
+            self.assertTrue((run_dir / "planner_notes.md").exists())
+            self.assertTrue((run_dir / "contrib.log").exists())
+            critic_notes = list(run_dir.glob("figures/*/iter_*/critic_notes.md"))
+            self.assertGreaterEqual(len(critic_notes), 1)
+
 
 if __name__ == "__main__":
     unittest.main()

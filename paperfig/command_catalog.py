@@ -6,6 +6,8 @@ from typing import List
 def get_command_catalog() -> List[str]:
     return [
         "generate",
+        "rerun",
+        "diff",
         "critique",
         "export",
         "doctor",
@@ -14,6 +16,7 @@ def get_command_catalog() -> List[str]:
         "docs check",
         "templates list",
         "templates validate",
+        "templates lint",
         "critique-architecture",
         "audit",
         "lab init",

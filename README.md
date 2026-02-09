@@ -81,6 +81,8 @@ Full architecture documentation and flow diagrams live in `docs/architecture`.
 ## CLI Usage
 <!-- AUTO-GEN:START cli-command-catalog -->
 - `paperfig generate`
+- `paperfig rerun`
+- `paperfig diff`
 - `paperfig critique`
 - `paperfig export`
 - `paperfig doctor`
@@ -89,6 +91,7 @@ Full architecture documentation and flow diagrams live in `docs/architecture`.
 - `paperfig docs check`
 - `paperfig templates list`
 - `paperfig templates validate`
+- `paperfig templates lint`
 - `paperfig critique-architecture`
 - `paperfig audit`
 - `paperfig lab init`

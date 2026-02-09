@@ -93,7 +93,11 @@ class PlannerAgent:
 
     def _plan_from_templates(self, paper: PaperContent) -> List[FigurePlan]:
         try:
-            catalog = load_template_catalog(template_dir=self.template_dir, pack_id=self.template_pack)
+            catalog = load_template_catalog(
+                template_dir=self.template_dir,
+                pack_id=self.template_pack,
+                pack=self.template_pack,
+            )
         except Exception:
             return []
 

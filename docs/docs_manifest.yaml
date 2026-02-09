@@ -14,6 +14,7 @@
       "mode": "validated",
       "required_sections": [
         "# Changelog",
+        "## [0.3.0] - 2026-02-09",
         "## [0.2.0] - 2026-02-08"
       ]
     },
@@ -112,6 +113,33 @@
         "## 1 Methodology",
         "## 2 System Architecture",
         "## 3 Results"
+      ]
+    },
+    {
+      "path": "docs/templates/HOW_TO_ADD_A_FLOW.md",
+      "mode": "validated",
+      "required_sections": [
+        "# How To Add A Flow Template",
+        "## Step 1: Add The YAML Template",
+        "## Step 6: Verify Full Quality Gate"
+      ]
+    },
+    {
+      "path": "docs/templates/DOMAIN_PACKS.md",
+      "mode": "validated",
+      "required_sections": [
+        "# Domain Packs",
+        "## Pack Layout",
+        "## Python Package Example"
+      ]
+    },
+    {
+      "path": "docs/platform/WINDOWS_PNG.md",
+      "mode": "validated",
+      "required_sections": [
+        "# Windows PNG Export",
+        "## Option 1: MSYS2 UCRT64",
+        "## Option 2: Conda-Forge Environment"
       ]
     }
   ],

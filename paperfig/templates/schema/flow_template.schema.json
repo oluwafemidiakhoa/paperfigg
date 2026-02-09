@@ -1,0 +1,145 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://paperfig.dev/schema/flow_template.schema.json",
+  "title": "paperfig flow template",
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "type",
+    "inputs",
+    "steps",
+    "outputs",
+    "scoring",
+    "metadata"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "type": {
+      "type": "string",
+      "minLength": 1
+    },
+    "inputs": {
+      "type": "object",
+      "required": [
+        "required_sections"
+      ],
+      "properties": {
+        "required_sections": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "kind"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "kind": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "outputs": {
+      "type": "object",
+      "properties": {
+        "figure_kind": {
+          "type": "string"
+        },
+        "caption_style": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    },
+    "scoring": {
+      "type": "object",
+      "properties": {
+        "critique_focus": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "metadata": {
+      "type": "object",
+      "required": [
+        "pack",
+        "order_hint",
+        "trigger_rules",
+        "caption_style",
+        "traceability_requirements",
+        "critique_focus",
+        "required_sections",
+        "element_blueprint"
+      ],
+      "properties": {
+        "pack": {
+          "type": "string",
+          "minLength": 1
+        },
+        "order_hint": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "trigger_rules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        },
+        "caption_style": {
+          "type": "string"
+        },
+        "traceability_requirements": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "critique_focus": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "required_sections": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "element_blueprint": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}
